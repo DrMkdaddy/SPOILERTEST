@@ -3,7 +3,7 @@
 import random
 import threading
 
-ATTEMPTS = 50000
+ATTEMPTS = 500000
 BONUS = 6
 DICE = (3, 6)
 
