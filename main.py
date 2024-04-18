@@ -3,68 +3,68 @@
 import random
 import threading
 
-ATTEMPTS = 500000
-BONUS = 6
-DICE = (3, 6)
+ATTEMPTS: int = 500000
+BONUS: int = 6
+DICE: tuple[int, int] = (3, 6)
 
 
 class Player:
-    def __init__(self, name, ac):
+    def __init__(self, name, ac) -> None:
         self.name = name
         self.ac = ac
         self.times_hit = 0
         self.lock = threading.Lock()
 
-    def does_hit(self, roll):
+    def does_hit(self, roll) -> None:
         with self.lock:
             if roll >= self.ac:
                 self.times_hit += 1
 
 
 class Otto(Player):
-    def __init__(self, name, ac, shield_slots):
+    def __init__(self, name, ac, shield_slots) -> None:
         super().__init__(name, ac)
         self.shield_slots = shield_slots
 
-    def shield(self):
+    def shield(self) -> int:
         if self.shield_slots <= 0:
             return 0
         else:
             self.shield_slots -= 1
             return 5
 
-    def does_hit(self, roll):
+    def does_hit(self, roll) -> None:
         with self.lock:
             if roll >= self.ac + self.shield():
                 self.times_hit += 1
 
 
-def gen_dice(tuple_in):
-    accumulator = 0
+def gen_dice(tuple_in: tuple[int, int]) -> int:
+    accumulator: int = 0
     dice_amount, dice_sides = tuple_in
     for _ in range(dice_amount):
         accumulator += random.randint(1, dice_sides)
     return accumulator
 
 
-def simulate_battle(player, attempts, bonus, dice_to_roll):
+def simulate_battle(player, attempts, bonus, dice_to_roll) -> None:
     for _ in range(attempts):
-        attack_roll = gen_dice(dice_to_roll)
+        attack_roll: int = gen_dice(dice_to_roll)
         player.does_hit(attack_roll + bonus)
 
 
 if __name__ == "__main__":
-    monolith = Player("Monolith", 19)
-    basilius = Player("Basilius", 16)
-    wulfkar = Player("Wulfkar", 16)
-    eshan = Player("Eshan", 16)
-    otto = Otto("Otto", 20, 3)
-    ludwig = Player("Ludwig", 17)
-    players = [monolith, basilius, eshan, otto, ludwig, wulfkar]
+    monolith: Player = Player("Monolith", 19)
+    basilius: Player = Player("Basilius", 16)
+    wulfkar: Player = Player("Wulfkar", 16)
+    eshan: Player = Player("Eshan", 16)
+    otto: Player = Otto("Otto", 20, 3)
+    ludwig: Player = Player("Ludwig", 17)
+    players: list[Player] = [monolith, basilius, eshan, otto, ludwig, wulfkar]
 
-    threads = []
+    threads: list[threading.Thread] = []
     for player in players:
-        thread = threading.Thread(
+        thread: threading.Thread = threading.Thread(
             target=simulate_battle, args=(player, ATTEMPTS, BONUS, DICE)
         )
         threads.append(thread)
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     for thread in threads:
         thread.join()
 
-    total_hits = sum(player.times_hit for player in players)
+    total_hits: int = sum(player.times_hit for player in players)
 
     print(
         f"[SPOILER] HAS A +{BONUS} TO HIT. AND IS ROLLING {DICE[0]}d{DICE[1]} - {ATTEMPTS} ATTEMPTS EACH."
